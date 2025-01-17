@@ -1,8 +1,12 @@
 import tkinter as tk
-from requests_games.card_matching_client import launch_game
+from client_gui.card_matching_client import launch_game as launch_memory_game
+from client_gui.simon_client import launch_game as launch_simon_game  # Import Simon game launcher
 
 GAMES = [
-    {"name": "Memory Game", "server_url": "http://127.0.0.1:5000"}
+    {"name": "Memory Game", "server_url": "http://127.0.0.1:5000", "launcher": launch_memory_game},
+    {"name": "Simon Game", "server_url": "http://127.0.0.1:5000", "launcher": launch_simon_game},
+    # Add Simon Game
+
 ]
 
 
@@ -20,7 +24,7 @@ class MainLauncher:
 
     def start_game(self, game):
         self.root.destroy()  # Close the launcher before starting the game
-        launch_game(game["server_url"])
+        game["launcher"](game["server_url"])  # Call the game's launcher function
 
 
 if __name__ == "__main__":
