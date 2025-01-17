@@ -4,7 +4,7 @@ import requests
 import winsound
 
 class SimonGame:
-    def __init__(self, root,server):
+    def __init__(self, root, server):
         self.root = root
         # self.API_URL = "http://127.0.0.1:5000"
         self.API_URL = server
@@ -107,5 +107,5 @@ class SimonGame:
 
 def launch_game(server):
     root = tk.Tk()
-    game = SimonGame(root,server)
+    game = SimonGame(root, server)
     root.mainloop()
