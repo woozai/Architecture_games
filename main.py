@@ -4,13 +4,16 @@ from client_gui.card_matching_client import launch_game as launch_memory_game
 from client_gui.simon_client import launch_game as launch_simon_game
 from client_gui.mastermind_client import launch_game as launch_mastermind_game
 from client_gui.hit_2048_client import launch_game as launch_2048_game
+from client_gui.hangman_client import launch_game as launch_hangman_game
 
 GAMES = [
-    {"name": "Memory Game", "server_url": "http://127.0.0.1:5000", "launcher": launch_memory_game},
-    {"name": "Simon Game", "server_url": "http://127.0.0.1:5000", "launcher": launch_simon_game},
-    {"name": "Mastermind Game", "server_url": "http://127.0.0.1:5000", "launcher": launch_mastermind_game},
     {"name": "2048 Game", "server_url": "http://127.0.0.1:5000", "launcher": launch_2048_game},
+    {"name": "Memory Game", "server_url": "http://127.0.0.1:5001", "launcher": launch_memory_game},
+    {"name": "Mastermind Game", "server_url": "http://127.0.0.1:5002", "launcher": launch_mastermind_game},
+    {"name": "Simon Game", "server_url": "http://127.0.0.1:5003", "launcher": launch_simon_game},
+    {"name": "Hangman game", "server_url": "http://127.0.0.1:5004", "launcher": launch_hangman_game},
 ]
+
 
 class MainLauncher:
     def __init__(self, root):
@@ -45,6 +48,7 @@ class MainLauncher:
             # Re-enable the button when the game closes
             self.running_games.pop(game["name"], None)
             self.buttons[game["name"]].config(state=tk.NORMAL)
+
 
 if __name__ == "__main__":
     root = tk.Tk()

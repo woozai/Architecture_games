@@ -11,12 +11,12 @@ class MastermindGame:
         self.root.title("Mastermind Game")
         self.root.geometry("500x700")
         self.root.resizable(False, False)
-
         self.colors = ['red', 'blue', 'green', 'yellow', 'orange', 'purple']
         self.code_length = 4
         self.current_guess = []
         self.game_id = None
         self.setup_gui()
+
 
 
     def setup_gui(self):

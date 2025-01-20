@@ -3,6 +3,7 @@ import random
 
 app = Flask(__name__)
 
+
 class Game2048:
     def __init__(self, size=4):
         self.size = size
@@ -62,13 +63,16 @@ class Game2048:
                     return True
         return False
 
+
 game = Game2048()
+
 
 @app.route('/new_game', methods=['POST'])
 def new_game():
     global game
     game = Game2048()
     return jsonify({"board": game.board, "score": game.score})
+
 
 @app.route('/move', methods=['POST'])
 def move():
@@ -86,9 +90,11 @@ def move():
     game.add_new_tile()
     return jsonify({"board": game.board, "score": game.score, "can_move": game.can_move()})
 
+
 @app.route('/state', methods=['GET'])
 def state():
     return jsonify({"board": game.board, "score": game.score, "can_move": game.can_move()})
 
+
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=True, port=5000)

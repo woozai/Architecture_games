@@ -6,11 +6,11 @@ app = Flask(__name__)
 
 ROWS, COLS = 4, 7
 CARD_IMAGES = [
-    "\U0001F600", "\U0001F601", "\U0001F602", "\U0001F923",
-    "\U0001F604", "\U0001F605", "\U0001F606", "\U0001F607",
-    "\U0001F609", "\U0001F60A", "\U0001F60B", "\U0001F60C",
-    "\U0001F60D", "\U0001F60E"
-] * 2
+                  "\U0001F600", "\U0001F601", "\U0001F602", "\U0001F923",
+                  "\U0001F604", "\U0001F605", "\U0001F606", "\U0001F607",
+                  "\U0001F609", "\U0001F60A", "\U0001F60B", "\U0001F60C",
+                  "\U0001F60D", "\U0001F60E"
+              ] * 2
 random.shuffle(CARD_IMAGES)
 CARD_IMAGES = CARD_IMAGES[:ROWS * COLS]
 
@@ -23,6 +23,7 @@ game_state = {
     "second_selection": None
 }
 
+
 def read_high_score():
     try:
         with open(HIGH_SCORE_FILE, "r") as file:
@@ -30,13 +31,16 @@ def read_high_score():
     except Exception:
         return None
 
+
 def write_high_score(score):
     with open(HIGH_SCORE_FILE, "w") as file:
         file.write(str(score))
 
+
 @app.route("/high_score", methods=["GET"])
 def get_high_score():
     return jsonify({"high_score": read_high_score()})
+
 
 @app.route("/reveal_card", methods=["POST"])
 def reveal_card():
@@ -54,6 +58,7 @@ def reveal_card():
 
     return jsonify({"card": CARD_IMAGES[x * COLS + y]})
 
+
 def check_match():
     x1, y1 = game_state["first_selection"]
     x2, y2 = game_state["second_selection"]
@@ -61,6 +66,7 @@ def check_match():
         game_state["matched"].extend([(x1, y1), (x2, y2)])
     game_state["first_selection"] = None
     game_state["second_selection"] = None
+
 
 @app.route("/reset_game", methods=["POST"])
 def reset_game():
@@ -75,5 +81,6 @@ def reset_game():
     })
     return jsonify({"message": "Game reset"})
 
+
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(debug=True, port=5001)
