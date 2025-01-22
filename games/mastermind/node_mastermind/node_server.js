@@ -4,82 +4,93 @@ const bodyParser = require("body-parser");
 const app = express();
 app.use(bodyParser.json());
 
-// Word list and game state
-const wordList = [
-  "python", "wizard", "dragon", "quest", "magic",
-  "castle", "grimoire", "phantom", "sorcery", "charm",
-  "oracle", "alchemy", "rune", "spell", "wand"
-];
+// Configuration
+const colors = ['red', 'blue', 'green', 'yellow', 'orange', 'purple'];
+const codeLength = 4;
+const maxAttempts = 20;
+const gameData = {};
 
-const gameState = {
-  target_word: wordList[Math.floor(Math.random() * wordList.length)].toUpperCase(),
-  guesses: [],
-  attempts: 0,
-  score: 0,
-};
+// Generate a secret code
+function generateSecretCode() {
+  return Array.from({ length: codeLength }, () =>
+    colors[Math.floor(Math.random() * colors.length)]
+  );
+}
 
-// Endpoint to start/restart the game
-app.get("/start", (req, res) => {
-  gameState.target_word = wordList[Math.floor(Math.random() * wordList.length)].toUpperCase();
-  gameState.guesses = [];
-  gameState.attempts = 0;
-  gameState.score = 0;
-  console.log("Game started: ", gameState.target_word); // Debug
-  res.json({ message: "Game started", word_length: gameState.target_word.length });
+// Start a new game
+app.post("/start", (req, res) => {
+  const gameId = Object.keys(gameData).length + 1;
+  const secretCode = generateSecretCode();
+  gameData[gameId] = {
+    secret_code: secretCode,
+    attempts: 0,
+    max_attempts: maxAttempts,
+    finished: false,
+  };
+  console.log(`Game ${gameId} started:`, secretCode); // Debug
+  res.status(201).json({ game_id: gameId, message: "Game started!" });
 });
 
-// Endpoint to handle a letter guess
+// Make a guess
 app.post("/guess", (req, res) => {
-  const { letter } = req.body;
-  console.log("Received guess: ", letter); // Debug
+  const { game_id, guess } = req.body;
 
-  if (!letter || typeof letter !== "string" || letter.length !== 1 || !/^[a-zA-Z]$/.test(letter)) {
-    console.log("Invalid input."); // Debug
-    return res.status(400).json({ error: "Invalid input. Please send a single letter." });
+  if (!game_id || !guess || guess.length !== codeLength) {
+    console.log("Invalid game ID or guess."); // Debug
+    return res.status(400).json({ error: "Invalid game ID or guess" });
   }
 
-  const upperLetter = letter.toUpperCase();
-
-  if (gameState.guesses.includes(upperLetter)) {
-    console.log(`Letter '${upperLetter}' already guessed.`); // Debug
-    return res.status(400).json({ error: `You already guessed '${upperLetter}'.` });
+  const game = gameData[game_id];
+  if (!game || game.finished) {
+    console.log("Invalid or finished game."); // Debug
+    return res.status(400).json({ error: "Invalid or finished game" });
   }
 
-  gameState.guesses.push(upperLetter);
-  gameState.attempts += 1;
+  game.attempts += 1;
 
-  let correct = false;
-  if (gameState.target_word.includes(upperLetter)) {
-    gameState.score += 4 + gameState.target_word.length; // Add points for correct guess
-    correct = true;
-    console.log(`Correct guess: '${upperLetter}'.`); // Debug
-  } else {
-    gameState.score -= 2 + gameState.target_word.length; // Deduct points for incorrect guess
-    console.log(`Incorrect guess: '${upperLetter}'.`); // Debug
+  const secretCode = game.secret_code;
+  const blackPegs = guess.reduce(
+    (count, color, index) => count + (color === secretCode[index] ? 1 : 0),
+    0
+  );
+  const whitePegs =
+    guess.reduce((count, color) => count + Math.min(
+      guess.filter(g => g === color).length,
+      secretCode.filter(s => s === color).length
+    ), 0) - blackPegs;
+
+  if (blackPegs === codeLength) {
+    game.finished = true;
+    console.log(`Game ${game_id} won in ${game.attempts} attempts.`); // Debug
+    return res.json({
+      result: "win",
+      black_pegs: blackPegs,
+      white_pegs: whitePegs,
+      attempts: game.attempts,
+    });
   }
 
-  // Prepare the displayed word with guessed letters
-  const displayed_word = gameState.target_word
-    .split("")
-    .map((char) => (gameState.guesses.includes(char) ? char : "_"))
-    .join(" ");
+  if (game.attempts >= maxAttempts) {
+    game.finished = true;
+    console.log(`Game ${game_id} lost. Secret code:`, secretCode); // Debug
+    return res.json({
+      result: "lose",
+      secret_code: secretCode,
+      black_pegs: blackPegs,
+      white_pegs: whitePegs,
+    });
+  }
 
-  const game_over = !displayed_word.includes("_");
-
-  console.log("Current game state:", { displayed_word, attempts: gameState.attempts, score: gameState.score, game_over }); // Debug
-
+  console.log(`Game ${game_id} ongoing. Attempts: ${game.attempts}.`); // Debug
   res.json({
-    correct,
-    displayed_word: displayed_word,
-    attempts: gameState.attempts,
-    score: gameState.score,
-    game_over: game_over,
-    guessed_letters: gameState.guesses, // Include guessed letters in the response
-    message: game_over ? "Congratulations! You won!" : "",
+    result: "ongoing",
+    black_pegs: blackPegs,
+    white_pegs: whitePegs,
+    attempts: game.attempts,
   });
 });
 
-const PORT = 5004;
+const PORT = 5002;
 app.listen(PORT, () => {
   console.log(`Server is running on http://0.0.0.0:${PORT}`);
 });
