@@ -48,7 +48,8 @@ def make_guess():
     if black_pegs == code_length:
         game['finished'] = True
         return jsonify(
-            {'result': 'win', 'black_pegs': black_pegs, 'white_pegs': white_pegs, 'attempts': game['attempts']})
+            {'result': 'win', 'black_pegs': black_pegs, 'white_pegs': white_pegs, 'attempts': game['attempts']}
+        )
 
     if game['attempts'] >= max_attempts:
         game['finished'] = True
@@ -58,6 +59,6 @@ def make_guess():
     return jsonify(
         {'result': 'ongoing', 'black_pegs': black_pegs, 'white_pegs': white_pegs, 'attempts': game['attempts']})
 
-
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=5002)
+
