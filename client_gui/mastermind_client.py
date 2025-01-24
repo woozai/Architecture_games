@@ -4,10 +4,10 @@ import requests
 class MastermindGame:
     # server_url = "http://127.0.0.1:5000"
 
-    def __init__(self, root, server):
+    def __init__(self, root, server, username):
         self.root = root
         self.server_url = server
-
+        self.username = username
         self.root.title("Mastermind Game")
         self.root.geometry("500x700")
         self.root.resizable(False, False)
@@ -57,10 +57,12 @@ class MastermindGame:
         self.history_container.pack(pady=10, fill="both", expand=True)
 
     def start_game(self):
-        response = requests.post(f"{self.server_url}/start")
+        payload = {"username": self.username}
+        response = requests.post(f"{self.server_url}/start", json=payload)
         if response.status_code == 201:
             self.enable_buttons()
             data = response.json()
+            print(data)
             self.game_id = data['game_id']
             self.message_label.config(text=data['message'])
             self.clear_guess()
@@ -118,8 +120,8 @@ class MastermindGame:
         self.submit_button.config(state=tk.NORMAL)
         self.clear_button.config(state=tk.NORMAL)
 
-def launch_game(server):
+def launch_game(server,username):
     root = tk.Tk()
-    app = MastermindGame(root, server)
+    app = MastermindGame(root, server, username)
     app.disable_buttons()
     root.mainloop()

@@ -1,10 +1,13 @@
 import tkinter as tk
 import requests
 import threading
+import tkinter.messagebox as messagebox
 
 class MemoryGameClient:
-    def __init__(self, root, server_url):
+    def __init__(self, root, server_url, username):
         self.root = root
+        self.username = username
+        self.attempts = 0
         self.server_url = server_url
         self.root.title("Memory Card Game")
         self.buttons = []
@@ -13,7 +16,7 @@ class MemoryGameClient:
 
     def create_ui(self):
         # High Score Label
-        self.high_score_label = tk.Label(self.root, text="High Score: None", font=("Helvetica", 16))
+        self.high_score_label = tk.Label(self.root, text=f"Score:{self.attempts}", font=("Helvetica", 16))
         self.high_score_label.grid(row=0, column=0, columnspan=7, pady=10)
 
         # Reset Button
@@ -45,12 +48,23 @@ class MemoryGameClient:
         # Request to reveal the card
         response = requests.post(f"{self.server_url}/reveal_card", json={"x": x, "y": y})
         if response.status_code == 200:
-            card = response.json()["card"]
+            print(response.json())
+            data = response.json()
+            # isFinished = data["is_finished"]
+            card = data["card"]
+            self.attempts = response.json()["attempts"]
+            self.high_score_label.config(text=f"High Score: {self.attempts}")
             self.buttons[x][y].config(text=card)
             if self.first_selection is None:
                 self.first_selection = ((x, y), card)
             else:
                 self.handle_second_selection(x, y, card)
+
+            # Show a popup if the game is finished
+            # if isFinished:
+            #     messagebox.showinfo("Game Finished",
+            #                         f"Congratulations {self.username}! You finished the game in {self.attempts} attempts!")
+
         else:
             print("Failed to reveal card:", response.json().get("error"))
 
@@ -73,10 +87,10 @@ class MemoryGameClient:
             threading.Timer(1, hide_cards).start()
 
     def reset_game(self):
-        response = requests.post(f"{self.server_url}/reset_game")
+        payload = {"player_name": self.username}
+        response = requests.post(f"{self.server_url}/reset_game", json=payload)
         if response.status_code == 200:
             self.first_selection = None
-            self.update_high_score()
             # Reset the grid
             for i in range(4):
                 for j in range(7):
@@ -84,16 +98,10 @@ class MemoryGameClient:
         else:
             print("Failed to reset game:", response.json().get("error"))
 
-    def update_high_score(self):
-        response = requests.get(f"{self.server_url}/high_score")
-        if response.status_code == 200:
-            high_score = response.json().get("high_score", "None")
-            self.high_score_label.config(text=f"High Score: {high_score}")
-        else:
-            print("Failed to fetch high score:", response.json().get("error"))
 
 
-def launch_game(server_url):
+
+def launch_game(server_url, username):
     root = tk.Tk()
-    MemoryGameClient(root, server_url)
+    MemoryGameClient(root, server_url, username)
     root.mainloop()

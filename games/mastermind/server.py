@@ -6,7 +6,7 @@ app = Flask(__name__)
 # Configuration
 colors = ['red', 'blue', 'green', 'yellow', 'orange', 'purple']
 code_length = 4
-max_attempts = 20
+max_attempts = 100
 game_data = {}
 
 
@@ -16,15 +16,29 @@ def generate_secret_code():
 
 @app.route('/start', methods=['POST'])
 def start_game():
+    # Get the username from the request body
+    data = request.json
+    username = data.get("username")
+    print(username)
+    if not username:
+        return jsonify({"error": "Username is required"}), 400
+
+    # Generate a new game ID
     game_id = len(game_data) + 1
     secret_code = generate_secret_code()
+    print(secret_code, flush=True)
+
+    # Store the game data with the username
     game_data[game_id] = {
+        'username': username,           # Store the username
         'secret_code': secret_code,
         'attempts': 0,
         'max_attempts': max_attempts,
-        'finished': False
+        'finished': False,
     }
-    return jsonify({'game_id': game_id, 'message': 'Game started!'}), 201
+
+    # Return the game ID and success message
+    return jsonify({'game_id': game_id, 'username': username, 'message': 'Game started!'}), 201
 
 
 @app.route('/guess', methods=['POST'])
@@ -47,6 +61,12 @@ def make_guess():
 
     if black_pegs == code_length:
         game['finished'] = True
+        payload = {
+            "username": game['username'],  # Fallback if name isn't set
+            "score": game['attempts'],
+            "game_name": "Mastermind"
+        }
+        print(payload, flush=True)
         return jsonify(
             {'result': 'win', 'black_pegs': black_pegs, 'white_pegs': white_pegs, 'attempts': game['attempts']}
         )

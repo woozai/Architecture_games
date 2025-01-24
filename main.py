@@ -73,7 +73,7 @@ class MainLauncher:
         self.running_games[game["name"]] = True
         try:
             print(f"Launching {game['name']} for player: {player_name}")
-            game["launcher"](game["server_url"])  # Launch the game
+            game["launcher"](game["server_url"], player_name)  # Launch the game
         except Exception as e:
             print(f"Error launching game: {e}")
         finally:
