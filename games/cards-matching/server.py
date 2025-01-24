@@ -69,7 +69,6 @@ def check_match():
     game_state["first_selection"] = None
     game_state["second_selection"] = None
     game_state["attempts"] += 1  # Increment attempts on each pair selected
-
     if len(game_state["matched"]) == ROWS * COLS:  # Game completed
         elapsed_time = time.time() - game_state["start_time"]
         update_high_score(game_state["attempts"], elapsed_time)
@@ -95,7 +94,6 @@ def reset_game():
     player_name = data.get("player_name")
     if not player_name:
         return jsonify({"error": "Player name is required"}), 400
-
     random.shuffle(CARD_IMAGES)
     CARD_IMAGES = CARD_IMAGES[:ROWS * COLS]
     game_state.update({

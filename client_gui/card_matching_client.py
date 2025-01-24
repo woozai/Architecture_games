@@ -15,7 +15,7 @@ class MemoryGameClient:
 
     def create_ui(self):
         # High Score Label
-        self.high_score_label = tk.Label(self.root, text=f"High Score:{self.attempts}", font=("Helvetica", 16))
+        self.high_score_label = tk.Label(self.root, text=f"Score:{self.attempts}", font=("Helvetica", 16))
         self.high_score_label.grid(row=0, column=0, columnspan=7, pady=10)
 
         # Reset Button
@@ -49,7 +49,8 @@ class MemoryGameClient:
         if response.status_code == 200:
             print(response.json())
             card = response.json()["card"]
-            # self.attempts = response.json()["attempts"]
+            self.attempts = response.json()["attempts"]
+            self.high_score_label.config(text=f"High Score: {self.attempts}")
             self.buttons[x][y].config(text=card)
             if self.first_selection is None:
                 self.first_selection = ((x, y), card)
@@ -88,13 +89,7 @@ class MemoryGameClient:
         else:
             print("Failed to reset game:", response.json().get("error"))
 
-    def update_high_score(self):
-        response = requests.get(f"{self.server_url}/high_score")
-        if response.status_code == 200:
-            high_score = response.json().get("high_score", "None")
-            self.high_score_label.config(text=f"High Score: {high_score}")
-        else:
-            print("Failed to fetch high score:", response.json().get("error"))
+
 
 
 def launch_game(server_url, username):
