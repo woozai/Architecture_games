@@ -17,6 +17,7 @@ CARD_IMAGES = CARD_IMAGES[:ROWS * COLS]
 HIGH_SCORE_FILE = "high_score.txt"
 
 game_state = {
+    "player_name": None,  # Add player name
     "matched": [],
     "start_time": time.time(),
     "first_selection": None,
@@ -55,10 +56,9 @@ def reveal_card():
         game_state["first_selection"] = (x, y)
     elif game_state["second_selection"] is None:
         game_state["second_selection"] = (x, y)
-        game_state["attempts"] += 1  # Increment attempts on each pair selected
         check_match()
 
-    return jsonify({"card": CARD_IMAGES[x * COLS + y]})
+    return jsonify({"card": CARD_IMAGES[x * COLS + y], "attempts": game_state["attempts"]})
 
 
 def check_match():
@@ -68,9 +68,17 @@ def check_match():
         game_state["matched"].extend([(x1, y1), (x2, y2)])
     game_state["first_selection"] = None
     game_state["second_selection"] = None
+    game_state["attempts"] += 1  # Increment attempts on each pair selected
+
     if len(game_state["matched"]) == ROWS * COLS:  # Game completed
         elapsed_time = time.time() - game_state["start_time"]
         update_high_score(game_state["attempts"], elapsed_time)
+        payload = {
+            "username": game_state.get("player_name", "Unknown Player"),  # Fallback if name isn't set
+            "score": game_state["attempts"],
+            "game_name": "Memory Game"
+        }
+        print(payload)
 
 
 def update_high_score(attempts, elapsed_time):
@@ -83,16 +91,22 @@ def update_high_score(attempts, elapsed_time):
 @app.route("/reset_game", methods=["POST"])
 def reset_game():
     global CARD_IMAGES
+    data = request.json
+    player_name = data.get("player_name")
+    if not player_name:
+        return jsonify({"error": "Player name is required"}), 400
+
     random.shuffle(CARD_IMAGES)
     CARD_IMAGES = CARD_IMAGES[:ROWS * COLS]
     game_state.update({
+        "player_name": player_name,  # Set player name
         "matched": [],
         "start_time": time.time(),
         "first_selection": None,
         "second_selection": None,
         "attempts": 0
     })
-    return jsonify({"message": "Game reset"})
+    return jsonify({"message": "Game reset", "player_name": player_name})
 
 
 @app.route("/score", methods=["GET"])

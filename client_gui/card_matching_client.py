@@ -3,8 +3,10 @@ import requests
 import threading
 
 class MemoryGameClient:
-    def __init__(self, root, server_url):
+    def __init__(self, root, server_url, username):
         self.root = root
+        self.username = username
+        self.attempts = 0
         self.server_url = server_url
         self.root.title("Memory Card Game")
         self.buttons = []
@@ -13,7 +15,7 @@ class MemoryGameClient:
 
     def create_ui(self):
         # High Score Label
-        self.high_score_label = tk.Label(self.root, text="High Score: None", font=("Helvetica", 16))
+        self.high_score_label = tk.Label(self.root, text=f"High Score:{self.attempts}", font=("Helvetica", 16))
         self.high_score_label.grid(row=0, column=0, columnspan=7, pady=10)
 
         # Reset Button
@@ -45,7 +47,9 @@ class MemoryGameClient:
         # Request to reveal the card
         response = requests.post(f"{self.server_url}/reveal_card", json={"x": x, "y": y})
         if response.status_code == 200:
+            print(response.json())
             card = response.json()["card"]
+            # self.attempts = response.json()["attempts"]
             self.buttons[x][y].config(text=card)
             if self.first_selection is None:
                 self.first_selection = ((x, y), card)
@@ -93,7 +97,7 @@ class MemoryGameClient:
             print("Failed to fetch high score:", response.json().get("error"))
 
 
-def launch_game(server_url):
+def launch_game(server_url, username):
     root = tk.Tk()
-    MemoryGameClient(root, server_url)
+    MemoryGameClient(root, server_url, username)
     root.mainloop()

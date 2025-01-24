@@ -1,3 +1,4 @@
+import requests
 from flask import Flask, request, jsonify
 import random
 
@@ -5,10 +6,11 @@ app = Flask(__name__)
 
 
 class Game2048:
-    def __init__(self, size=4):
+    def __init__(self, username, size=4):
         self.size = size
         self.board = [[0] * size for _ in range(size)]
         self.score = 0
+        self.username = username  # Store the username
         self.add_new_tile()
         self.add_new_tile()
 
@@ -55,24 +57,48 @@ class Game2048:
     def can_move(self):
         for r in range(self.size):
             for c in range(self.size):
+                # Check if there are empty tiles
                 if self.board[r][c] == 0:
                     return True
+                # Check if adjacent tiles can be merged horizontally
                 if c < self.size - 1 and self.board[r][c] == self.board[r][c + 1]:
                     return True
+                # Check if adjacent tiles can be merged vertically
                 if r < self.size - 1 and self.board[r][c] == self.board[r + 1][c]:
                     return True
+                payload = {
+                    "username": self.username,  # Ensure username is stored in the Game2048 instance
+                    "score": self.score,
+                    "game_name": "2048"
+                }
+                print(payload)
         return False
+            # If no moves are possible, send a request to the database server
+            # try:
+                # response = requests.post("http://localhost:5001/upload_score", json=payload)
+
+            #     if response.status_code == 201:
+            #         print("Score successfully uploaded to the database!")
+            #     else:
+            #         print(f"Failed to upload score: {response.status_code}, {response.json()}")
+            # except Exception as e:
+            #     print(f"Error sending score to the database: {e}")
 
 
-game = Game2048()
+
+
+
 
 
 @app.route('/new_game', methods=['POST'])
 def new_game():
     global game
-    game = Game2048()
-    return jsonify({"board": game.board, "score": game.score})
-
+    data = request.json
+    username = data.get("username")
+    if not username:
+        return jsonify({"error": "Username is required"}), 400
+    game = Game2048(username)  # Pass username to Game2048
+    return jsonify({"board": game.board, "score": game.score, "username": username})
 
 @app.route('/move', methods=['POST'])
 def move():

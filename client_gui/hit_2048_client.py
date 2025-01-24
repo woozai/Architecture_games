@@ -3,10 +3,11 @@ import requests
 
 
 class Game2048GUI:
-    def __init__(self, server):
+    def __init__(self, server, username):
         # self.api_url = "http://127.0.0.1:5000"
         self.api_url = server
         self.window = tk.Tk()
+        self.username = username  # Store the username
         self.game_over = False  # Initialize game_over flag
         self.window.title("2048 Game")
         self.score_label = tk.Label(self.window, text="Score: 0", font=("Helvetica", 16))
@@ -32,6 +33,16 @@ class Game2048GUI:
         response = requests.post(f"{self.api_url}/new_game")
         self.update_grid(response.json())
 
+    def start_new_game(self):
+        # Replace 'Player1' with the actual name entered in your frontend form
+        payload = {"username": self.username}
+
+        response = requests.post(f"{self.api_url}/new_game", json=payload)
+        if response.status_code == 200:
+            print(response.json())
+            self.update_grid(response.json())
+        else:
+            print(f"Error starting a new game: {response.status_code}, {response.json()}")
     def handle_keypress(self, event):
         if self.game_over:  # Check if the game is already over
             return  # Do nothing if the game is over
@@ -84,6 +95,6 @@ class Game2048GUI:
         self.window.mainloop()
 
 
-def launch_game(server_url):
-    game_gui = Game2048GUI(server_url)
+def launch_game(server_url, username):
+    game_gui = Game2048GUI(server_url, username)
     game_gui.play()
