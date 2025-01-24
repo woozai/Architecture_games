@@ -5,7 +5,8 @@ Thumbs.db
 
 # Node.js modules
 node_modules/
-
+games/hangman/node_hangman/node_modules
+games/mastermind/node_hangman/node_modules
 # Logs
 logs/
 *.log
