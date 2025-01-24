@@ -78,10 +78,10 @@ class MemoryGameClient:
             threading.Timer(1, hide_cards).start()
 
     def reset_game(self):
-        response = requests.post(f"{self.server_url}/reset_game")
+        payload = {"player_name": self.username}
+        response = requests.post(f"{self.server_url}/reset_game", json=payload)
         if response.status_code == 200:
             self.first_selection = None
-            self.update_high_score()
             # Reset the grid
             for i in range(4):
                 for j in range(7):

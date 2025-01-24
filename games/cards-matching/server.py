@@ -48,10 +48,8 @@ def get_high_score():
 def reveal_card():
     x = request.json.get("x")
     y = request.json.get("y")
-
     if (x, y) in game_state["matched"]:
         return jsonify({"error": "Card already matched"}), 400
-
     if game_state["first_selection"] is None:
         game_state["first_selection"] = (x, y)
     elif game_state["second_selection"] is None:
