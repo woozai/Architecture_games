@@ -13,16 +13,29 @@ game_state = {
     "guesses": [],
     "attempts": 0,
     "score": 0,
+    "username": ""
 }
 
-@app.route("/start", methods=["GET"])
+
+@app.route("/start", methods=["POST"])
 def start_game():
     """Reset the game and return initial state."""
+    data = request.json  # Get the JSON payload from the frontend
+    username = data.get("username")  # Extract the username
+    if not username:
+        return jsonify({"error": "Username is required"}), 400
+
+    game_state["username"] = username  # Store the username in the game state
     game_state["target_word"] = random.choice(word_list).upper()
     game_state["guesses"] = []
     game_state["attempts"] = 0
     game_state["score"] = 0
-    return jsonify({"message": "Game started", "word_length": len(game_state["target_word"])})
+    return jsonify({
+        "message": "Game started",
+        "word_length": len(game_state["target_word"]),
+        "username": username
+    })
+
 
 @app.route("/guess", methods=["POST"])
 def guess_letter():
@@ -49,8 +62,11 @@ def guess_letter():
     # Prepare response data
     displayed_word = " ".join([l if l in game_state["guesses"] else "_" for l in game_state["target_word"]])
     game_over = "_" not in displayed_word
+    print(game_over, flush=True)
+
 
     return jsonify({
+        "username": game_state["username"],
         "correct": correct,
         "displayed_word": displayed_word,
         "attempts": game_state["attempts"],

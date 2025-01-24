@@ -1,6 +1,7 @@
 import tkinter as tk
 import requests
 import threading
+import tkinter.messagebox as messagebox
 
 class MemoryGameClient:
     def __init__(self, root, server_url, username):
@@ -48,7 +49,9 @@ class MemoryGameClient:
         response = requests.post(f"{self.server_url}/reveal_card", json={"x": x, "y": y})
         if response.status_code == 200:
             print(response.json())
-            card = response.json()["card"]
+            data = response.json()
+            # isFinished = data["is_finished"]
+            card = data["card"]
             self.attempts = response.json()["attempts"]
             self.high_score_label.config(text=f"High Score: {self.attempts}")
             self.buttons[x][y].config(text=card)
@@ -56,6 +59,12 @@ class MemoryGameClient:
                 self.first_selection = ((x, y), card)
             else:
                 self.handle_second_selection(x, y, card)
+
+            # Show a popup if the game is finished
+            # if isFinished:
+            #     messagebox.showinfo("Game Finished",
+            #                         f"Congratulations {self.username}! You finished the game in {self.attempts} attempts!")
+
         else:
             print("Failed to reveal card:", response.json().get("error"))
 

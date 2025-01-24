@@ -4,13 +4,13 @@ import requests
 
 
 class WordGuessGameGUI:
-    def __init__(self, root,server_url):
+    def __init__(self, root, server_url, username):
         self.root = root
         self.root.title("Word Guess Game")
         self.api_url = server_url
         self.word_length = 0
         self.score = 0
-
+        self.username = username
         self.create_widgets()
         self.start_game()
 
@@ -57,9 +57,11 @@ class WordGuessGameGUI:
     def start_game(self):
         """Start a new game by calling the API."""
         self.log_debug("Starting a new game...")
-        response = requests.get(f"{self.api_url}/start")
+        payload = {"username": self.username}
+        response = requests.post(f"{self.api_url}/start", json=payload)
         if response.status_code == 200:
             data = response.json()
+            print(data)
             self.word_length = data["word_length"]
             self.score = 0
             self.word_label.config(text="_ " * self.word_length)
@@ -103,7 +105,7 @@ class WordGuessGameGUI:
             self.log_debug(f"Error processing guess: {response.status_code}, {response.text}")
 
 
-def launch_game(server_url):
+def launch_game(server_url, username):
     root = tk.Tk()
-    WordGuessGameGUI(root, server_url)
+    WordGuessGameGUI(root, server_url, username)
     root.mainloop()

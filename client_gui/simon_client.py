@@ -4,14 +4,14 @@ import requests
 import winsound
 
 class SimonGame:
-    def __init__(self, root, server):
+    def __init__(self, root, server,username ):
         self.root = root
         # self.API_URL = "http://127.0.0.1:5000"
         self.API_URL = server
         self.sequence = []
         self.colors = ['red', 'blue', 'green', 'yellow']
         self.score = 0
-
+        self.username = username
         # Initialize GUI
         self.root.title("Simon Game")
         self.root.geometry("400x500")
@@ -44,11 +44,18 @@ class SimonGame:
         self.start_button.pack(pady=20)
 
     def start_game(self):
-        response = requests.post(f"{self.API_URL}/start")
+        # Include the username in the request body
+        payload = {"username": self.username}
+        response = requests.post(f"{self.API_URL}/start", json=payload)
+
         if response.status_code == 200:
+            print(response.json())
             self.message_label.config(text="Game started! Watch closely.")
             self.score = 0
             self.next_round()
+        else:
+            self.message_label.config(text="Failed to start the game.")
+            print(f"Error: {response.status_code}, {response.text}")
 
     def next_round(self):
         response = requests.get(f"{self.API_URL}/sequence")
@@ -105,7 +112,7 @@ class SimonGame:
         for btn in self.buttons.values():
             btn.config(state=tk.DISABLED)
 
-def launch_game(server):
+def launch_game(server, username):
     root = tk.Tk()
-    game = SimonGame(root, server)
+    game = SimonGame(root, server, username)
     root.mainloop()

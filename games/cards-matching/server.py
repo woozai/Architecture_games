@@ -62,6 +62,7 @@ def reveal_card():
 def check_match():
     x1, y1 = game_state["first_selection"]
     x2, y2 = game_state["second_selection"]
+    print(game_state["matched"], flush=True)
     if CARD_IMAGES[x1 * COLS + y1] == CARD_IMAGES[x2 * COLS + y2]:
         game_state["matched"].extend([(x1, y1), (x2, y2)])
     game_state["first_selection"] = None
@@ -75,7 +76,8 @@ def check_match():
             "score": game_state["attempts"],
             "game_name": "Memory Game"
         }
-        print(payload)
+        print(payload, flush=True)
+
 
 
 def update_high_score(attempts, elapsed_time):
