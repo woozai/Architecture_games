@@ -1,0 +1,28 @@
+version: '3.8'
+services:
+  "2048":
+    build:
+      context: ./games/2048
+    ports:
+      - "5000:5000"  # Adjust the port
+  cards_matching:
+    build:
+      context: ./games/cards-matching
+    ports:
+      - "5001:5001"
+  hangman:
+    build:
+      context: ./games/hangman
+    ports:
+      - "5004:5004"
+  mastermind:
+    build:
+      context: ./games/mastermind
+    ports:
+      - "5002:5002"
+  simon:
+    build:
+      context: ./games/simon
+    ports:
+      - "5003:5003"
+
