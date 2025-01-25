@@ -25,4 +25,15 @@ services:
       context: ./games/simon
     ports:
       - "5003:5003"
+  node_mastermind:
+    build:
+      context: ./games/mastermind/node_mastermind
+    ports:
+      - "3001:3001"
+  node_hangman:
+    build:
+      context: ./games/hangman/node_hangman
+    ports:
+      - "3002:3002"
+
 

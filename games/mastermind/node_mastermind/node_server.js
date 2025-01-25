@@ -7,28 +7,34 @@ app.use(bodyParser.json());
 // Configuration
 const colors = ['red', 'blue', 'green', 'yellow', 'orange', 'purple'];
 const codeLength = 4;
-const maxAttempts = 20;
+const maxAttempts = 100;
 const gameData = {};
 
-// Generate a secret code
+// Generate a secret code without duplicates
 function generateSecretCode() {
-  return Array.from({ length: codeLength }, () =>
-    colors[Math.floor(Math.random() * colors.length)]
-  );
+  const shuffledColors = colors.sort(() => 0.5 - Math.random());
+  return shuffledColors.slice(0, codeLength);
 }
 
 // Start a new game
 app.post("/start", (req, res) => {
+  const { username } = req.body;
+
+  if (!username) {
+    return res.status(400).json({ error: "Username is required" });
+  }
+
   const gameId = Object.keys(gameData).length + 1;
   const secretCode = generateSecretCode();
   gameData[gameId] = {
+    username: username,
     secret_code: secretCode,
     attempts: 0,
     max_attempts: maxAttempts,
     finished: false,
   };
-  console.log(`Game ${gameId} started:`, secretCode); // Debug
-  res.status(201).json({ game_id: gameId, message: "Game started!" });
+  console.log(`Game ${gameId} started for user ${username}:`, secretCode); // Debug
+  res.status(201).json({ game_id: gameId, username: username, message: "Game started!" });
 });
 
 // Make a guess
@@ -61,9 +67,10 @@ app.post("/guess", (req, res) => {
 
   if (blackPegs === codeLength) {
     game.finished = true;
-    console.log(`Game ${game_id} won in ${game.attempts} attempts.`); // Debug
+    console.log(`Game ${game_id} won by ${game.username} in ${game.attempts} attempts.`); // Debug
     return res.json({
       result: "win",
+      username: game.username,
       black_pegs: blackPegs,
       white_pegs: whitePegs,
       attempts: game.attempts,
@@ -72,25 +79,27 @@ app.post("/guess", (req, res) => {
 
   if (game.attempts >= maxAttempts) {
     game.finished = true;
-    console.log(`Game ${game_id} lost. Secret code:`, secretCode); // Debug
+    console.log(`Game ${game_id} lost by ${game.username}. Secret code:`, secretCode); // Debug
     return res.json({
       result: "lose",
+      username: game.username,
       secret_code: secretCode,
       black_pegs: blackPegs,
       white_pegs: whitePegs,
     });
   }
 
-  console.log(`Game ${game_id} ongoing. Attempts: ${game.attempts}.`); // Debug
+  console.log(`Game ${game_id} ongoing for ${game.username}. Attempts: ${game.attempts}.`); // Debug
   res.json({
     result: "ongoing",
+    username: game.username,
     black_pegs: blackPegs,
     white_pegs: whitePegs,
     attempts: game.attempts,
   });
 });
 
-const PORT = 5002;
+const PORT = 3001;
 app.listen(PORT, () => {
   console.log(`Server is running on http://0.0.0.0:${PORT}`);
 });
