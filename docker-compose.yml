@@ -63,6 +63,18 @@ services:
     networks:
       - local_network
 
+  node_mastermind:
+    build:
+      context: ./games/mastermind/node_mastermind
+    ports:
+      - "3001:3001"
+  node_hangman:
+    build:
+      context: ./games/hangman/node_hangman
+    ports:
+      - "3002:3002"
+
+
 volumes:
   mongodb_data:
 
