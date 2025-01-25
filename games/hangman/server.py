@@ -1,3 +1,4 @@
+import requests
 from flask import Flask, request, jsonify
 import random
 
@@ -63,6 +64,19 @@ def guess_letter():
     displayed_word = " ".join([l if l in game_state["guesses"] else "_" for l in game_state["target_word"]])
     game_over = "_" not in displayed_word
     print(game_over, flush=True)
+    payload = {
+        "username": game_state["username"],  # Ensure username is stored in the Game2048 instance
+        "score": game_state["score"],
+        "game_name": "hangman"
+    }
+    print(payload, flush=True)
+    print("fsafasfasfasf", flush=True)
+    response = requests.post("http://proxy_server:5010/submit_score", json=payload)
+
+    if response.status_code == 201:
+        print("Score submitted successfully!")
+    else:
+        print(f"Failed to submit score: {response.status_code}, {response.json()}")
 
 
     return jsonify({
@@ -78,4 +92,4 @@ def guess_letter():
 
 
 if __name__ == "__main__":
-    app.run(debug=True, host='0.0.0.0', port=5004)
+    app.run(debug=True, host='0.0.0.0', port=5003)

@@ -1,28 +1,71 @@
 version: '3.8'
 services:
+  mongodb:
+    image: mongo:6.0
+    container_name: local_mongodb
+    restart: always
+    ports:
+      - "27017:27017"  # MongoDB listens on 27017 inside the container
+    volumes:
+      - mongodb_data:/data/db  # Persistent storage for MongoDB
+    networks:
+      - local_network
+
+  proxy_server:
+    build:
+      context: ./proxy  # Path to the proxy server code
+    container_name: proxy_server
+    restart: always
+    ports:
+      - "5010:5010"  # Proxy server runs on port 5010
+    depends_on:
+      - mongodb  # Ensure MongoDB starts before the proxy server
+    networks:
+      - local_network
+
   "2048":
     build:
       context: ./games/2048
     ports:
-      - "5000:5000"  # Adjust the port
+      - "5001:5001"
+    networks:
+      - local_network
+
   cards_matching:
     build:
       context: ./games/cards-matching
     ports:
-      - "5001:5001"
+      - "5002:5002"
+    networks:
+      - local_network
+
   hangman:
     build:
       context: ./games/hangman
     ports:
-      - "5004:5004"
+      - "5003:5003"
+    networks:
+      - local_network
+
   mastermind:
     build:
       context: ./games/mastermind
     ports:
-      - "5002:5002"
+      - "5004:5004"
+    networks:
+      - local_network
+
   simon:
     build:
       context: ./games/simon
     ports:
-      - "5003:5003"
+      - "5005:5005"
+    networks:
+      - local_network
 
+volumes:
+  mongodb_data:
+
+networks:
+  local_network:
+    driver: bridge

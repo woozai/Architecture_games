@@ -1,3 +1,4 @@
+import requests
 from flask import Flask, jsonify, request
 import random
 import time
@@ -74,9 +75,15 @@ def check_match():
         payload = {
             "username": game_state.get("player_name", "Unknown Player"),  # Fallback if name isn't set
             "score": game_state["attempts"],
-            "game_name": "Memory Game"
+            "game_name": "memory_card_game"
         }
         print(payload, flush=True)
+        response = requests.post("http://proxy_server:5010/submit_score", json=payload)
+
+        if response.status_code == 201:
+            print("Score submitted successfully!")
+        else:
+            print(f"Failed to submit score: {response.status_code}, {response.json()}")
 
 
 
@@ -116,4 +123,4 @@ def get_score():
 
 
 if __name__ == "__main__":
-    app.run(debug=True, host='0.0.0.0', port=5001)
+    app.run(debug=True, host='0.0.0.0', port=5002)
