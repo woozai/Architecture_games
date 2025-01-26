@@ -1,3 +1,4 @@
+import requests
 from flask import Flask, request, jsonify
 import random
 
@@ -64,9 +65,15 @@ def make_guess():
         payload = {
             "username": game['username'],  # Fallback if name isn't set
             "score": game['attempts'],
-            "game_name": "Mastermind"
+            "game_name": "mastermind"
         }
         print(payload, flush=True)
+        response = requests.post("http://proxy_server:5010/submit_score", json=payload)
+
+        if response.status_code == 201:
+            print("Score submitted successfully!")
+        else:
+            print(f"Failed to submit score: {response.status_code}, {response.json()}")
         return jsonify(
             {'result': 'win', 'black_pegs': black_pegs, 'white_pegs': white_pegs, 'attempts': game['attempts']}
         )
@@ -80,5 +87,5 @@ def make_guess():
         {'result': 'ongoing', 'black_pegs': black_pegs, 'white_pegs': white_pegs, 'attempts': game['attempts']})
 
 if __name__ == '__main__':
-    app.run(debug=True, host='0.0.0.0', port=5002)
+    app.run(debug=True, host='0.0.0.0', port=5004)
 

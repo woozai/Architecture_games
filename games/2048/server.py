@@ -1,6 +1,7 @@
 import requests
 from flask import Flask, request, jsonify
 import random
+import json
 
 app = Flask(__name__)
 
@@ -59,33 +60,14 @@ class Game2048:
             for c in range(self.size):
                 # Check if there are empty tiles
                 if self.board[r][c] == 0:
-                    return True
+                    return True, self.username, self.score
                 # Check if adjacent tiles can be merged horizontally
                 if c < self.size - 1 and self.board[r][c] == self.board[r][c + 1]:
-                    return True
+                    return True, self.username, self.score
                 # Check if adjacent tiles can be merged vertically
                 if r < self.size - 1 and self.board[r][c] == self.board[r + 1][c]:
-                    return True
-                payload = {
-                    "username": self.username,  # Ensure username is stored in the Game2048 instance
-                    "score": self.score,
-                    "game_name": "2048"
-                }
-                print(payload)
-        return False
-            # If no moves are possible, send a request to the database server
-            # try:
-                # response = requests.post("http://localhost:5001/upload_score", json=payload)
-
-            #     if response.status_code == 201:
-            #         print("Score successfully uploaded to the database!")
-            #     else:
-            #         print(f"Failed to upload score: {response.status_code}, {response.json()}")
-            # except Exception as e:
-            #     print(f"Error sending score to the database: {e}")
-
-
-
+                    return True, self.username, self.score
+        return False , self.username, self.score
 
 
 
@@ -114,7 +96,31 @@ def move():
     else:
         return jsonify({"error": "Invalid direction"}), 400
     game.add_new_tile()
-    return jsonify({"board": game.board, "score": game.score, "can_move": game.can_move()})
+    can_move, name, score = game.can_move()
+    if not can_move:
+        payload = {
+            "username": name,  # Ensure username is stored in the Game2048 instance
+            "score": score,
+            "game_name": "2048"
+        }
+        print(payload, flush=True)
+        print("fsafasfasfasf", flush=True)
+        response = requests.post("http://proxy_server:5010/submit_score", json=payload)
+
+        if response.status_code == 201:
+            print("Score submitted successfully!")
+        else:
+            print(f"Failed to submit score: {response.status_code}, {response.json()}")
+
+
+        # get score
+        score_response = requests.get("http://proxy_server:5010/get_scores")
+        if score_response.status_code == 200:
+            print(json.dumps(score_response.json(), indent=4), flush=True)
+        else:
+            print(f"Failed to submit score")
+
+    return jsonify({"board": game.board, "score": game.score, "can_move": can_move})
 
 
 @app.route('/state', methods=['GET'])
@@ -123,4 +129,4 @@ def state():
 
 
 if __name__ == '__main__':
-    app.run(debug=True, host='0.0.0.0', port=5000)
+    app.run(debug=True, host='0.0.0.0', port=5001)

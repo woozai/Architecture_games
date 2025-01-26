@@ -1,26 +1,13 @@
 import tkinter as tk
-from tkinter import ttk
-import threading
-from client_gui.card_matching_client import launch_game as launch_memory_game
-from client_gui.simon_client import launch_game as launch_simon_game
-from client_gui.mastermind_client import launch_game as launch_mastermind_game
-from client_gui.hit_2048_client import launch_game as launch_2048_game
-from client_gui.hangman_client import launch_game as launch_hangman_game
-
-GAMES = [
-    {"name": "2048 Game", "server_url": "http://localhost:5000", "launcher": launch_2048_game},
-    {"name": "Memory Game", "server_url": "http://localhost:5001", "launcher": launch_memory_game},
-    {"name": "Mastermind Game", "server_url": "http://localhost:5002", "launcher": launch_mastermind_game},
-    {"name": "Simon Game", "server_url": "http://localhost:5003", "launcher": launch_simon_game},
-    {"name": "Hangman Game", "server_url": "http://localhost:5004", "launcher": launch_hangman_game},
-]
-
+from tkinter import ttk, messagebox
+from games_buttons import GameButtons
+from high_scores import HighScores
 
 class MainLauncher:
     def __init__(self, root):
         self.root = root
         self.root.title("Game Launcher")
-        self.root.geometry("550x700")
+        self.root.geometry("550x750")
         self.root.configure(bg="#2c3e50")
 
         # Title label
@@ -36,50 +23,19 @@ class MainLauncher:
         # Label for selecting a game
         tk.Label(root, text="Select a Game to Play", font=("Helvetica", 18), bg="#2c3e50", fg="#f39c12").pack(pady=20)
 
-        self.buttons = {}
-        self.running_games = {}
-
-        # Style for buttons
-        self.style = ttk.Style()
-        self.style.configure("Rounded.TButton", font=("Helvetica", 14), padding=10, relief="flat", background="#1abc9c",
-                             foreground="#2c3e50", borderwidth=1)
-        self.style.map("Rounded.TButton",
-                       background=[("active", "#16a085")],
-                       foreground=[("active", "#ffffff")],
-                       relief=[("pressed", "groove")])
-
         # Game buttons
-        button_frame = tk.Frame(root, bg="#2c3e50")
-        button_frame.pack(pady=10)
-        for game in GAMES:
-            btn = ttk.Button(button_frame, text=game["name"], style="Rounded.TButton",
-                             command=lambda g=game: self.start_game(g))
-            btn.pack(pady=10, ipadx=20, ipady=5, fill=tk.X)
-            self.buttons[game["name"]] = btn
+        self.game_buttons = GameButtons(root, self.name_var)
+        self.game_buttons.pack()
 
-    def start_game(self, game):
-        player_name = self.name_var.get().strip()
-        if not player_name:
-            tk.messagebox.showwarning("Name Required", "Please enter your name before selecting a game.")
-            return
+        # High Scores button
+        high_scores_btn = ttk.Button(
+            root, text="View High Scores", style="Rounded.TButton",
+            command=self.open_high_scores
+        )
+        high_scores_btn.pack(pady=20, ipadx=20, ipady=5, fill=tk.X)
 
-        # Disable the button to prevent re-launching
-        self.buttons[game["name"]].state(["disabled"])
-
-        # Start the game in a separate thread
-        threading.Thread(target=self.run_game, args=(game, player_name), daemon=True).start()
-
-    def run_game(self, game, player_name):
-        self.running_games[game["name"]] = True
-        try:
-            print(f"Launching {game['name']} for player: {player_name}")
-            game["launcher"](game["server_url"], player_name)  # Launch the game
-        except Exception as e:
-            print(f"Error launching game: {e}")
-        finally:
-            # Re-enable the button when the game closes
-            self.running_games.pop(game["name"], None)
-            self.buttons[game["name"]].state(["!disabled"])
+    def open_high_scores(self):
+        HighScores(self.root)
 
 
 if __name__ == "__main__":

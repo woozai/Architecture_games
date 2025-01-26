@@ -25,6 +25,7 @@ class MemoryGameClient:
 
         # Game Grid
         self.create_grid()
+        self.reset_game()
 
     def create_grid(self):
         for i in range(4):
