@@ -69,7 +69,13 @@ def check_match():
     game_state["first_selection"] = None
     game_state["second_selection"] = None
     game_state["attempts"] += 1  # Increment attempts on each pair selected
+    print("--------------", flush=True)
+    print(ROWS * COLS, flush=True)
+    print(game_state["matched"], flush=True)
+    print(len(game_state["matched"]), flush=True)
+    print("--------------", flush=True)
     if len(game_state["matched"]) == ROWS * COLS:  # Game completed
+        print("Finished", flush=True)
         elapsed_time = time.time() - game_state["start_time"]
         update_high_score(game_state["attempts"], elapsed_time)
         payload = {
