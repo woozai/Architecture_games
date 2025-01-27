@@ -23,58 +23,6 @@ services:
     networks:
       - local_network
 
-  "2048":
-    build:
-      context: ./games/2048
-    ports:
-      - "5001:5001"
-    networks:
-      - local_network
-
-  cards_matching:
-    build:
-      context: ./games/cards-matching
-    ports:
-      - "5002:5002"
-    networks:
-      - local_network
-
-  hangman:
-    build:
-      context: ./games/hangman
-    ports:
-      - "5003:5003"
-    networks:
-      - local_network
-
-  mastermind:
-    build:
-      context: ./games/mastermind
-    ports:
-      - "5004:5004"
-    networks:
-      - local_network
-
-  simon:
-    build:
-      context: ./games/simon
-    ports:
-      - "5005:5005"
-    networks:
-      - local_network
-
-  node_mastermind:
-    build:
-      context: ./games/mastermind/node_mastermind
-    ports:
-      - "3001:3001"
-  node_hangman:
-    build:
-      context: ./games/hangman/node_hangman
-    ports:
-      - "3002:3002"
-
-
 volumes:
   mongodb_data:
 

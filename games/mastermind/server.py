@@ -48,8 +48,13 @@ def make_guess():
     game_id = data.get('game_id')
     guess = data.get('guess')
 
+    # Validate input
     if not game_id or not guess or len(guess) != code_length:
         return jsonify({'error': 'Invalid game ID or guess'}), 400
+
+    # Ensure no repeated colors in the guess
+    if len(set(guess)) != len(guess):
+        return jsonify({'error': 'Guess must not contain repeated colors'}), 400
 
     game = game_data.get(game_id)
     if not game or game['finished']:
@@ -63,7 +68,7 @@ def make_guess():
     if black_pegs == code_length:
         game['finished'] = True
         payload = {
-            "username": game['username'],  # Fallback if name isn't set
+            "username": game['username'],
             "score": game['attempts'],
             "game_name": "mastermind"
         }
