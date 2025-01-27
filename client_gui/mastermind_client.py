@@ -72,25 +72,39 @@ class MastermindGame:
             self.message_label.config(text="Error starting the game. Try again.")
 
     def submit_guess(self):
+        # Validate if the game is initialized and the guess is of the correct length
         if not self.game_id or len(self.current_guess) != self.code_length:
             self.message_label.config(text=f"Please complete your guess with {self.code_length} colors.")
             return
 
-        response = requests.post(f"{self.server_url}/guess", json={'game_id': self.game_id, 'guess': self.current_guess})
-        if response.status_code == 200:
-            data = response.json()
-            if data['result'] == 'win':
-                self.message_label.config(text=f"Congratulations! You won in {data['attempts']} attempts!")
-                self.disable_buttons()
-            elif data['result'] == 'lose':
-                self.message_label.config(text=f"Game Over! The correct code was: {', '.join(data['secret_code'])}")
-                self.disable_buttons()
+        # Check for repeated colors in the guess
+        if len(set(self.current_guess)) != len(self.current_guess):
+            self.message_label.config(text="Your guess must not contain repeated colors.")
+            return
+
+        try:
+            # Submit the guess to the server
+            response = requests.post(
+                f"{self.server_url}/guess",
+                json={'game_id': self.game_id, 'guess': self.current_guess}
+            )
+
+            if response.status_code == 200:
+                data = response.json()
+                if data['result'] == 'win':
+                    self.message_label.config(text=f"Congratulations! You won in {data['attempts']} attempts!")
+                    self.disable_buttons()
+                elif data['result'] == 'lose':
+                    self.message_label.config(text=f"Game Over! The correct code was: {', '.join(data['secret_code'])}")
+                    self.disable_buttons()
+                else:
+                    self.add_guess_to_history(self.current_guess, data['black_pegs'], data['white_pegs'])
+                    self.message_label.config(text=f"Black: {data['black_pegs']}, White: {data['white_pegs']}")
+                    self.clear_guess()
             else:
-                self.add_guess_to_history(self.current_guess, data['black_pegs'], data['white_pegs'])
-                self.message_label.config(text=f"Black: {data['black_pegs']}, White: {data['white_pegs']}")
-                self.clear_guess()
-        else:
-            self.message_label.config(text="Error submitting the guess.")
+                self.message_label.config(text=f"Error submitting the guess: {response.status_code}")
+        except requests.exceptions.RequestException as e:
+            self.message_label.config(text=f"Network error: {e}")
 
     def add_guess_to_history(self, guess, black_pegs, white_pegs):
         history_row = tk.Frame(self.history_container)
