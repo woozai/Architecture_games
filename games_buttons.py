@@ -11,7 +11,7 @@ GAMES = [
     {"name": "2048 Game", "description": "Merge tiles to reach 2048.", "server_url": "http://localhost:5001", "launcher": launch_2048_game},
     {"name": "Memory Game", "description": "Match pairs of cards.", "server_url": "http://localhost:5002", "launcher": launch_memory_game},
     {"name": "Hangman Game", "description": "Guess the word before time runs out.", "server_url": "http://localhost:5003", "launcher": launch_hangman_game},
-    {"name": "Mastermind Game", "description": "Crack the color code.", "server_url": "http://127.0.0.1:5004", "launcher": launch_mastermind_game},
+    {"name": "Mastermind Game", "description": "Crack the color code.", "server_url": "http://localhost:5004", "launcher": launch_mastermind_game},
     {"name": "Simon Game", "description": "Follow the color sequence.", "server_url": "http://localhost:5005", "launcher": launch_simon_game},
 ]
 
