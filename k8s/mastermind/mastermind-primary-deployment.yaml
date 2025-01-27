@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mastermind-primary
+  labels:
+    app: mastermind-primary
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mastermind-primary
+  template:
+    metadata:
+      labels:
+        app: mastermind-primary
+    spec:
+      containers:
+      - name: mastermind-primary
+        image: architecture_games-mastermind  # Replace with your Docker image
+        imagePullPolicy: Never
+        ports:
+        - containerPort: 5004
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 5004
+          initialDelaySeconds: 20 # Increased startup delay
+          periodSeconds: 5
+          timeoutSeconds: 5       # Added timeout for faster failure detection
+          failureThreshold: 3     # Allow retries before marking as failed
+          successThreshold: 1     # Mark healthy after one success
+        resources:
+          requests:
+            memory: "256Mi"       # Minimum memory required
+            cpu: "500m"           # Minimum CPU required
+          limits:
+            memory: "512Mi"       # Maximum memory allowed
+            cpu: "1"              # Maximum CPU allowed

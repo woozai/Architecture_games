@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mastermind-backup-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mastermind
+      role: backup
+  template:
+    metadata:
+      labels:
+        app: mastermind
+        role: backup
+    spec:
+      containers:
+      - name: mastermind-backup
+        image: architecture_games-node_mastermind
+        imagePullPolicy: Never
+        ports:
+        - containerPort: 3001
+

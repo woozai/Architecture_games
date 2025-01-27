@@ -1,0 +1,22 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mastermind-failover-config
+data:
+  nginx.conf: |
+    worker_processes 1;
+    events { worker_connections 1024; }
+    http {
+      upstream mastermind_upstream {
+        server localhost:31004 ;
+        server localhost:32001 backup;
+      }
+      server {
+        listen 90;
+        server_name localhost;
+    
+        location / {
+          proxy_pass http://mastermind_upstream;
+        }
+      }
+    }

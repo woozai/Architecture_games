@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mastermind-failover-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mastermind-failover
+  template:
+    metadata:
+      labels:
+        app: mastermind-failover
+    spec:
+      hostNetwork: true
+      containers:
+      - name: nginx
+        image: nginx:latest
+        ports:
+          - containerPort: 90
+        volumeMounts:
+          - name: nginx-config
+            mountPath: /etc/nginx/nginx.conf
+            subPath: nginx.conf
+      volumes:
+        - name: nginx-config
+          configMap:
+            name: mastermind-failover-config
+            items:
+              - key: nginx.conf
+                path: nginx.conf

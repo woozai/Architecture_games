@@ -11,7 +11,7 @@ COPY . /app
 RUN pip install -r requirements.txt
 
 # Expose port 8001 for the game server
-EXPOSE 8001
+EXPOSE 5004
 
 # Run the server
 CMD ["python3", "server.py"]
