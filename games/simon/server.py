@@ -60,7 +60,7 @@ def check_input():
             "game_name": "simon"
         }
         print(payload, flush=True)
-        response = requests.post("http://proxy_server:5010/submit_score", json=payload)
+        response = requests.post("http://host.docker.internal:31010/submit_score", json=payload)
 
         if response.status_code == 201:
             print("Score submitted successfully!")

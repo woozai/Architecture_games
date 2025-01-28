@@ -105,20 +105,13 @@ def move():
         }
         print(payload, flush=True)
         print("fsafasfasfasf", flush=True)
-        response = requests.post("http://proxy_server:5010/submit_score", json=payload)
+        response = requests.post("http://host.docker.internal:31010/submit_score", json=payload)
 
         if response.status_code == 201:
             print("Score submitted successfully!")
         else:
             print(f"Failed to submit score: {response.status_code}, {response.json()}")
 
-
-        # get score
-        score_response = requests.get("http://proxy_server:5010/get_scores")
-        if score_response.status_code == 200:
-            print(json.dumps(score_response.json(), indent=4), flush=True)
-        else:
-            print(f"Failed to submit score")
 
     return jsonify({"board": game.board, "score": game.score, "can_move": can_move})
 

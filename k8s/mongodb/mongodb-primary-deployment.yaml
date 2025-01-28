@@ -1,0 +1,24 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mongodb-primary-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mongodb
+      role: primary
+  template:
+    metadata:
+      labels:
+        app: mongodb
+        role: primary
+    spec:
+      containers:
+      - name: mongodb-primary
+        image: mongo:6.0
+        imagePullPolicy: Never
+        ports:
+        - containerPort: 27017
+
+
