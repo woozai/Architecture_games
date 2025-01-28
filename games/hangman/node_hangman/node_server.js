@@ -77,7 +77,37 @@ app.post("/guess", (req, res) => {
 
   if (game_over) {
     console.log(`Game won by ${gameState.username}. Word: ${gameState.target_word}`); // Debug
-  }
+
+    const payload = {
+      username: gameState.username, // Ensure username is stored in the gameState object
+      score: gameState.score,
+      game_name: "hangman",
+    };
+
+    console.log(payload); // Debug payload data
+    console.log("fsafasfasfasf"); // Debug extra print
+
+    // Send the score submission request
+    fetch("http://host.docker.internal:31010/submit_score", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(payload),
+    })
+      .then((response) => {
+        if (response.status === 201) {
+          console.log("Score submitted successfully!");
+        } else {
+          response.json().then((error) => {
+            console.error(`Failed to submit score: ${response.status}`, error);
+          });
+        }
+      })
+      .catch((error) => {
+        console.error("Error submitting score:", error);
+      });
+    }
 
   res.json({
     username: gameState.username,

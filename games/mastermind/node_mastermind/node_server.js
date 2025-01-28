@@ -68,6 +68,32 @@ app.post("/guess", (req, res) => {
   if (blackPegs === codeLength) {
     game.finished = true;
     console.log(`Game ${game_id} won by ${game.username} in ${game.attempts} attempts.`); // Debug
+    const payload = {
+    username: game.username,
+    score: game.attempts,
+    game_name: "mastermind",
+  };
+
+  // Send the score submission request
+  fetch("http://host.docker.internal:31010/submit_score", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(payload),
+  })
+    .then((response) => {
+      if (response.status === 201) {
+        console.log("Score submitted successfully!");
+      } else {
+        response.json().then((error) => {
+          console.error(`Failed to submit score: ${response.status}`, error);
+        });
+      }
+    })
+    .catch((error) => {
+      console.error("Error submitting score:", error);
+    });
     return res.json({
       result: "win",
       username: game.username,

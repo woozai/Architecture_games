@@ -8,7 +8,7 @@ data:
     events { worker_connections 1024; }
     http {
       upstream mastermind_upstream {
-        server localhost:31004 ;
+        server localhost:31004;
         server localhost:32001 backup;
       }
       server {
