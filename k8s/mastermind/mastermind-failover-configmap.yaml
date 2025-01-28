@@ -8,7 +8,7 @@ data:
     events { worker_connections 1024; }
     http {
       upstream mastermind_upstream {
-        server 10.1.3.43:5004 ;
+        server mastermind-primary-service.default.svc.cluster.local:5004 ;
         server mastermind-backup-service.default.svc.cluster.local:3001 backup;
       }
       server {
