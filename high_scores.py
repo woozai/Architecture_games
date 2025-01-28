@@ -41,7 +41,7 @@ class HighScores:
         # Fetch and display scores
         try:
             # Simulating a GET request to fetch scores
-            score_response = requests.get("http://host.docker.internal:31010/get_scores")
+            score_response = requests.get("http://localhost:31010/get_scores")
             if score_response.status_code == 200:
                 data = score_response.json()  # Assuming data contains the list of `games`
 
@@ -99,7 +99,7 @@ class HighScores:
 
     def clear_data(self):
         try:
-            response = requests.delete("http://localhost:5010/clear_data")
+            response = requests.delete("http://localhost:31010/clear_data")
             if response.status_code == 200:
                 messagebox.showinfo("Success", response.json().get("message", "Data cleared."))
             else:

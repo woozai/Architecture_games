@@ -12,7 +12,6 @@ spec:
       labels:
         app: hangman-failover
     spec:
-      hostNetwork: true
       containers:
       - name: nginx
         image: nginx:latest

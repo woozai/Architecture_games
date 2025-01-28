@@ -3,11 +3,10 @@ kind: Service
 metadata:
   name: hangman-backup-service
 spec:
-  type: NodePort
+  type: LoadBalancer
   selector:
     app: hangman
     role: backup
   ports:
   - port: 3002
     targetPort: 3002
-    nodePort: 32002

@@ -3,10 +3,10 @@ kind: Service
 metadata:
   name: hangman-primary-service
 spec:
-  type: NodePort
+  type: LoadBalancer
   selector:
     app: hangman
+    role: primary
   ports:
-  - port: 5003
-    targetPort: 5003
-    nodePort: 31003
+    - port: 5003           # Service port
+      targetPort: 5003     # Pod's container port

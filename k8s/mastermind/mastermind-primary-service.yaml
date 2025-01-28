@@ -3,10 +3,9 @@ kind: Service
 metadata:
   name: mastermind-primary-service
 spec:
-  type: NodePort
   selector:
     app: mastermind
   ports:
-  - port: 5004
-    targetPort: 5004
-    nodePort: 31004
+    - port: 5004                        # Exposed port on the service
+      targetPort: 5004                  # Container port to route traffic
+  type: LoadBalancer                       # Internal access only (default)

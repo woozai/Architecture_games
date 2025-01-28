@@ -3,11 +3,11 @@ kind: Service
 metadata:
   name: mastermind-backup-service
 spec:
-  type: NodePort
+  type: LoadBalancer
   selector:
     app: mastermind
     role: backup
   ports:
   - port: 3001
     targetPort: 3001
-    nodePort: 32001
+
