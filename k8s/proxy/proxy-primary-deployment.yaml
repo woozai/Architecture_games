@@ -1,0 +1,24 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: proxy-primary-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: proxy
+      role: primary
+  template:
+    metadata:
+      labels:
+        app: proxy
+        role: primary
+    spec:
+      containers:
+      - name: proxy-primary
+        image: architecture_games-proxy_server
+        imagePullPolicy: Never
+        ports:
+        - containerPort: 5010
+
+

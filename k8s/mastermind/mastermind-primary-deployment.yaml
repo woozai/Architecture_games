@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mastermind-primary-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mastermind
+      role: primary
+  template:
+    metadata:
+      labels:
+        app: mastermind
+        role: primary
+    spec:
+      containers:
+      - name: mastermind-primary
+        image: architecture_games-mastermind
+        imagePullPolicy: Never
+        ports:
+        - containerPort: 5004
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 5004
+
+
+
+

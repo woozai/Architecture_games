@@ -60,7 +60,7 @@ def check_input():
             "game_name": "simon"
         }
         print(payload, flush=True)
-        response = requests.post("http://proxy_server:5010/submit_score", json=payload)
+        response = requests.post("http://host.docker.internal:31010/submit_score", json=payload)
 
         if response.status_code == 201:
             print("Score submitted successfully!")
@@ -74,6 +74,9 @@ def get_score():
     global score
     return jsonify({"score": score})
 
+@app.route('/health', methods=['GET'])
+def health_check():
+    return "OK", 200
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=5005)

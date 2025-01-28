@@ -71,7 +71,7 @@ def guess_letter():
     }
     print(payload, flush=True)
     print("fsafasfasfasf", flush=True)
-    response = requests.post("http://proxy_server:5010/submit_score", json=payload)
+    response = requests.post("http://host.docker.internal:31010/submit_score", json=payload)
 
     if response.status_code == 201:
         print("Score submitted successfully!")
@@ -90,6 +90,9 @@ def guess_letter():
         "message": "Congratulations! You won!" if game_over else "",
     })
 
+@app.route('/health', methods=['GET'])
+def health_check():
+    return "OK", 200
 
 if __name__ == "__main__":
     app.run(debug=True, host='0.0.0.0', port=5003)

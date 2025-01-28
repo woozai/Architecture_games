@@ -1,0 +1,27 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: simon-primary-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: simon
+      role: primary
+  template:
+    metadata:
+      labels:
+        app: simon
+        role: primary
+    spec:
+      containers:
+      - name: simon-primary
+        image: architecture_games-simon
+        imagePullPolicy: Never
+        ports:
+        - containerPort: 5005
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 5005
+

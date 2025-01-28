@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hangman-backup-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: hangman
+      role: backup
+  template:
+    metadata:
+      labels:
+        app: hangman
+        role: backup
+    spec:
+      containers:
+      - name: hangman-backup
+        image: architecture_games-node_hangman
+        imagePullPolicy: Never
+        ports:
+        - containerPort: 3002
+        # ...

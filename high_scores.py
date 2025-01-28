@@ -41,7 +41,7 @@ class HighScores:
         # Fetch and display scores
         try:
             # Simulating a GET request to fetch scores
-            score_response = requests.get("http://localhost:5010/get_scores")
+            score_response = requests.get("http://host.docker.internal:31010/get_scores")
             if score_response.status_code == 200:
                 data = score_response.json()  # Assuming data contains the list of `games`
 

@@ -1,0 +1,27 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: primary-deployment-2048
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: "2048"
+      role: primary
+  template:
+    metadata:
+      labels:
+        app: "2048"
+        role: primary
+    spec:
+      containers:
+      - name: primary-2048
+        image: architecture_games-2048
+        imagePullPolicy: Never
+        ports:
+        - containerPort: 5001
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 5001
+

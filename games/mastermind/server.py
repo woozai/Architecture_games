@@ -73,7 +73,7 @@ def make_guess():
             "game_name": "mastermind"
         }
         print(payload, flush=True)
-        response = requests.post("http://proxy_server:5010/submit_score", json=payload)
+        response = requests.post("http://host.docker.internal:31010/submit_score", json=payload)
 
         if response.status_code == 201:
             print("Score submitted successfully!")
@@ -91,6 +91,9 @@ def make_guess():
     return jsonify(
         {'result': 'ongoing', 'black_pegs': black_pegs, 'white_pegs': white_pegs, 'attempts': game['attempts']})
 
+@app.route('/health', methods=['GET'])
+def health_check():
+    return "OK", 200
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=5004)

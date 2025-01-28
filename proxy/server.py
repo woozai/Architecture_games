@@ -5,7 +5,7 @@ from datetime import datetime
 app = Flask(__name__)
 
 # Connect to the MongoDB container (mapped to localhost:5005)
-client = MongoClient("mongodb://mongodb:27017/")  # Inside the Docker network, MongoDB listens on port 27017
+client = MongoClient("mongodb://host.docker.internal:30001/")  # Inside the Docker network, MongoDB listens on port 27017
 db = client["game_scores_db"]
 scores_collection = db["scores"]
 
@@ -81,6 +81,9 @@ def get_scores_by_game():
     print(scores, flush=True)
     return jsonify(scores), 200
 
+@app.route('/health', methods=['GET'])
+def health_check():
+    return "OK", 200
 
 if __name__ == "__main__":
     app.run(debug=True, host="0.0.0.0", port=5010)

@@ -1,0 +1,27 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hangman-primary-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: hangman
+      role: primary
+  template:
+    metadata:
+      labels:
+        app: hangman
+        role: primary
+    spec:
+      containers:
+      - name: hangman-primary
+        image: architecture_games-hangman
+        imagePullPolicy: Never
+        ports:
+        - containerPort: 5003
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 5003
+
